@@ -1,0 +1,1 @@
+export const runtime={siteId:'santas-helper',siteName:"Santa's Helper",services:{commerce:null,starquest:null},features:{wallet:true,commerce:true,share:true,collect:true}};
