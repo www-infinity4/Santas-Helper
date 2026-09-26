@@ -1,0 +1,1 @@
+export async function mountWallet(host,_runtime){host.innerHTML='<div class="empty"><h2>Unified Wallet</h2><p>The shared wallet module mounts here. Santa’s Helper does not keep an authoritative local balance.</p></div>';return host;}
