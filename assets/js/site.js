@@ -1,0 +1,7 @@
+import { runtime } from '../../config/runtime.js';
+import { searchProducts } from '../../adapters/commerce.js';
+import { mountWallet } from '../../adapters/wallet.js';
+const form=document.querySelector('#giftSearch'),results=document.querySelector('#results'),walletButton=document.querySelector('#walletButton'),walletHost=document.querySelector('#walletHost');
+form.addEventListener('submit',async e=>{e.preventDefault();const query=new FormData(form).get('q')?.trim();if(!query)return;results.innerHTML='<div class="empty">Looking for gifts…</div>';try{const products=await searchProducts(query,runtime);results.innerHTML=products.length?'<div class="product-grid">'+products.map(p=>'<article class="product-card"><h2>'+escapeHtml(p.title)+'</h2><p>'+escapeHtml(p.description||'')+'</p><a href="'+escapeAttr(p.destinationUrl)+'" rel="sponsored noopener">View at merchant</a></article>').join('')+'</div>':'<div class="empty">No connected merchant results yet.</div>';}catch(err){results.innerHTML='<div class="empty">Product service is not connected yet. The page itself is ready for the shared Commerce-Phi adapter.</div>';}});
+walletButton.addEventListener('click',async()=>{walletHost.hidden=false;await mountWallet(walletHost,runtime);});
+function escapeHtml(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}function escapeAttr(v=''){return escapeHtml(v);}
