@@ -3,11 +3,15 @@ function stableReference(productId){if(!productId)throw new Error('Product actio
 export async function shareProduct(product){
   const reference=stableReference(product.productId);
   const payload={title:product.title||"Santa's Helper gift",text:product.description||'Gift idea from Santa\'s Helper',url:product.destinationUrl};
-  if(navigator.share){await navigator.share(payload);}
-  else if(navigator.clipboard){await navigator.clipboard.writeText(payload.url);}
-  else throw new Error('Sharing is not available in this browser.');
-  window.ControlPhi?.recordShare?.({reference,url:payload.url,title:payload.title});
-  return {reference,shared:true};
+  if(!navigator.share){
+    if(navigator.clipboard){await navigator.clipboard.writeText(payload.url);return {reference,shared:false,copied:true};}
+    throw new Error('Sharing is not available in this browser.');
+  }
+  await navigator.share(payload);
+  const ledger=window.StarQuestCloudLedger;
+  if(!ledger?.submitShare)throw new Error('Authoritative share ledger is not connected.');
+  const receipt=await ledger.submitShare({attemptId:reference,contentId:reference,method:'web_share_api',showTitle:payload.title,attributionStatus:'client_confirmed'});
+  return {reference,shared:true,receipt};
 }
 
 export async function collectProduct(product){
